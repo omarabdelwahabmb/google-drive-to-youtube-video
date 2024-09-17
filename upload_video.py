@@ -72,12 +72,14 @@ https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 
 def get_authenticated_service(args):
+    if not os.path.exists(CLIENT_SECRETS_FILE):
+        sys.exit(f"Missing client_secrets.json file. Please make sure the file exists in the directory: {os.path.abspath(CLIENT_SECRETS_FILE)}")
+
     flow = InstalledAppFlow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,
-        scopes=[YOUTUBE_UPLOAD_SCOPE],
-        message=MISSING_CLIENT_SECRETS_MESSAGE
+        scopes=[YOUTUBE_UPLOAD_SCOPE]
     )
-    
+
     if args.noauth_local_webserver:
         flow.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
     
@@ -89,10 +91,10 @@ def get_authenticated_service(args):
 
     if not credentials or not credentials.valid:
         if credentials and credentials.expired and credentials.refresh_token:
-            credentials.refresh(Request()) if args.noauth_local_webserver else flow.run_local_server()
+            credentials.refresh(Request())
         else:
-            credentials = flow.run_console()
-
+            credentials = flow.run_console() if args.noauth_local_webserver else flow.run_local_server()
+    
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, credentials=credentials)
 
 def initialize_upload(youtube, options):
