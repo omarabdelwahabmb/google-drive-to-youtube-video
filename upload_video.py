@@ -93,7 +93,7 @@ def get_authenticated_service(args):
         if credentials and credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
         else:
-            credentials = flow.run_local_server() if not args.noauth_local_webserver else flow.run_console()
+            credentials = flow.run_local_server() if not args.noauth_local_webserver else flow.run()
 
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, credentials=credentials)
 
