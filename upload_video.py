@@ -93,8 +93,8 @@ def get_authenticated_service(args):
         if credentials and credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
         else:
-            credentials = flow.run_console() if args.noauth_local_webserver else flow.run_local_server()
-    
+            credentials = flow.run_local_server() if not args.noauth_local_webserver else flow.run_console()
+
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, credentials=credentials)
 
 def initialize_upload(youtube, options):
