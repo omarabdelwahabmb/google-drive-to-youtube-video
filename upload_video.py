@@ -77,7 +77,10 @@ def get_authenticated_service(args):
         scopes=[YOUTUBE_UPLOAD_SCOPE],
         message=MISSING_CLIENT_SECRETS_MESSAGE
     )
-
+    
+  if args.noauth_local_webserver:
+        flow.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
+    
     credentials = None
     if os.path.exists(f"{sys.argv[0]}-oauth2.json"):
         credentials = service_account.Credentials.from_authorized_user_file(
@@ -86,7 +89,7 @@ def get_authenticated_service(args):
 
     if not credentials or not credentials.valid:
         if credentials and credentials.expired and credentials.refresh_token:
-            credentials.refresh(Request())
+            credentials.refresh(Request()) if args.noauth_local_webserver else flow.run_local_server()
         else:
             credentials = flow.run_console()
 
@@ -163,6 +166,8 @@ if __name__ == '__main__':
     parser.add_argument("--keywords", help="Video keywords, comma separated", default="")
     parser.add_argument("--privacyStatus", choices=VALID_PRIVACY_STATUSES,
                         default=VALID_PRIVACY_STATUSES[0], help="Video privacy status.")
+    parser.add_argument("--noauth_local_webserver", action="store_true",
+                        help="Indicates that the application should not use a local web server for authentication.")
     args = parser.parse_args()
 
     if not os.path.exists(args.file):
