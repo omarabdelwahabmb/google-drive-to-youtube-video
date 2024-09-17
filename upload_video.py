@@ -78,7 +78,7 @@ def get_authenticated_service(args):
         message=MISSING_CLIENT_SECRETS_MESSAGE
     )
     
-  if args.noauth_local_webserver:
+    if args.noauth_local_webserver:
         flow.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
     
     credentials = None
